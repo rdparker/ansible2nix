@@ -8,9 +8,13 @@
       url = "github:teto/flake-compat/support-packages";
       flake = false;
     };
+    poetry2nix = {
+      url = "github:nix-community/poetry2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
+  outputs = { self, nixpkgs, flake-utils, poetry2nix, ... }:
     flake-utils.lib.eachSystem [
       "aarch64-linux"
       "x86_64-linux"
@@ -19,7 +23,10 @@
     ] (system: let
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ self.overlay ];
+        overlays = [
+          self.overlay
+          poetry2nix.overlays.default
+        ];
       };
 
     in {
